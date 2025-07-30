@@ -1,0 +1,25 @@
+app:
+  # APP_NAME - название приложения
+  APP_NAME: "archive-files" 
+  # APP_VERSION - версия приложения
+  APP_VERSION: 1
+  # APP_NUM_LINKS - максимальное количесво ссылок для скачивания в запросе 
+  APP_NUM_LINKS: 4
+  # APP_CONTENT_TYPE - разрешенный формат файлов
+  APP_CONTENT_TYPE: "application/pdf,image/jpeg"
+  # APP_MAX_BYTES_RESP - ограничение размера скачиваемого файла
+  APP_MAX_BYTES_RESP: 51200
+
+http:
+  # HTTP_PORT - порт для запуска приложения
+  HTTP_PORT: ":8080"
+
+log:
+  # LOG_LEVEL - уровень логирования
+  LOG_LEVEL: debug
+
+swagger:
+  # SWAGGER_ENABLED - включение сваггера
+  SWAGGER_ENABLED: true
+ 
+ 

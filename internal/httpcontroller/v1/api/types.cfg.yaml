@@ -1,0 +1,5 @@
+# yaml-language-server: ...
+package: api
+generate:
+  models: true
+output: api/types.gen.go

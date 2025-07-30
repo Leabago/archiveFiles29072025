@@ -1,0 +1,131 @@
+openapi: 3.1.1
+info:
+  title: "share-my-files"
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+ /api/v1/upload:
+    post:
+      summary: Send a set of links
+      description: Send links
+      operationId: setOfLinks
+      requestBody:
+        required: true
+        content:
+          application/json:            
+            schema:
+               $ref: '#/components/schemas/SetOfLinks'
+ 
+
+      responses:
+        '200':
+          description: Archived successfully
+          headers:
+            Content-Type:
+              schema:
+                type: string
+            X-Error:
+              schema:
+                type: boolean
+          content:
+            application/zip:
+              schema:      
+                type: string
+                format: binary
+
+                
+        '400':
+          description: Unable to archive one or more files
+          headers:
+            Content-Type:
+              schema:
+                type: string
+            X-Error:
+              schema:
+                type: boolean
+          content:
+            application/zip:
+              schema:      
+                type: string
+                format: binary
+        '500':
+          description: An unexpected internal server error occurred
+          headers:
+            Content-Type:
+              schema:
+                type: string
+            X-Error:
+              schema:
+                type: boolean
+          content:
+            text/plain:
+              schema:      
+                type: string
+
+
+ /api/v1/task:
+    post:
+      description: Create a new task
+      operationId: createTask
+      responses:            
+        '201':
+          description: Task created
+          headers:
+            Location:
+              schema:
+                type: string
+              example: "/tasks/123"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+
+components:
+  schemas:
+    Links:
+      type: array
+      items:
+        type: string
+      example: ["link1", "link2", "link3"]
+
+    SetOfLinks:      
+      type: object
+      properties:
+        links:
+          $ref: '#/components/schemas/Links'
+
+    Task:
+      type: object
+      properties:
+        id: 
+          type: string
+        created: 
+          type: string
+          format: date-time
+        links:
+          $ref: '#/components/schemas/Links'
+
+
+
+#     ProcessedLinks:
+#       type: object
+#       properties:
+#         success:
+#           type: boolean
+#           example: true
+#         fileDetails:
+#           type: array
+#           items:
+#             $ref: '#/components/schemas/LinkDetail'
+#     LinkDetail:
+#       type: object
+#       properties:
+#         name:
+#           type: string
+#           example: document.pdf
+#         success:
+#           type: boolean
+#           example: true
