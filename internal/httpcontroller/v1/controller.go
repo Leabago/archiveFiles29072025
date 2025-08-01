@@ -15,5 +15,5 @@ var OpenApi embed.FS
 var _ api.ServerInterface = (*V1)(nil)
 
 type V1 struct {
-	usecase usecase.ILinks
+	Usecase usecase.ILinks
 }

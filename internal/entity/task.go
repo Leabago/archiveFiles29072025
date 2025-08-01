@@ -1,35 +1,45 @@
 package entity
 
-import "sync"
+import (
+	"sync"
+	"sync/atomic"
+)
+
+const StatusCreaing = "creating"
+const StatusReady = "ready"
+
+var counterID uint64
+
+// сделать ID
+func NextID() uint64 {
+	return atomic.AddUint64(&counterID, 1)
+}
+
+func NewTask() *Task {
+	return &Task{
+		ID:     NextID(),
+		Status: StatusCreaing,
+	}
+}
 
 type Task struct {
-	ID    string
-	Links []Link
-	Dir   string
+	Status   string
+	ID       uint64
+	Links    []Link
+	FilePath string
+
+	DownloadLink string
+	Err          error
 }
 
 type Link struct {
-	URL string
+	URL      string
+	FileName string
+	Err      error
 }
 
 var (
-	tasks   = make(map[string]Task)
-	taskMux sync.RWMutex
+	tasks           = make(map[uint64]Task)
+	activeTaskCount int64
+	taskMux         sync.Mutex
 )
-
-func CreateTask(task Task) {
-	taskMux.Lock()
-	defer taskMux.Unlock()
-	tasks[task.ID] = task
-}
-
-func AddLink(taskID string, link Link) bool {
-	taskMux.Lock()
-	defer taskMux.Unlock()
-	if task, exists := tasks[taskID]; exists {
-		task.Links = append(task.Links, link)
-		tasks[taskID] = task
-		return true
-	}
-	return false
-}

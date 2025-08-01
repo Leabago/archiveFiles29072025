@@ -9,3 +9,7 @@ import (
 type IhttpClient interface {
 	DownloadByLink(url string, num int, l *zap.Logger) *entity.DownloadResult
 }
+
+type ItempFileManager interface {
+	CreateTask() (*entity.Task, error)
+}

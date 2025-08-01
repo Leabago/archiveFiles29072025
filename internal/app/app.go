@@ -21,8 +21,9 @@ func Run(cfg *config.Config) error {
 
 	// repo
 	httpClient := httpclient.New(cfg.App.ContentType, cfg.App.MaxBytesResp)
+
 	// usecase
-	u := links.New(httpClient, cfg.App.MaxNumLinks)
+	u := links.New(httpClient, cfg.App.MaxNumLinks, cfg.App.MaxTaskCount)
 	// controller
 	httpServer := httpserver.New(cfg.HTTP.Port)
 	httpcontroller.NewRouter(cfg, httpServer.Server, u)

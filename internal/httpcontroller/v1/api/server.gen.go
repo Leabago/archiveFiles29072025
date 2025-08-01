@@ -16,13 +16,20 @@ import (
 	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/oapi-codegen/runtime"
 )
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
+	// (GET /api/v1/arch/{taskID})
+	GetArchive(w http.ResponseWriter, r *http.Request, taskID int)
+
 	// (POST /api/v1/task)
 	CreateTask(w http.ResponseWriter, r *http.Request)
+
+	// (PATCH /api/v1/task/{taskID})
+	AppendLink(w http.ResponseWriter, r *http.Request, taskID int)
 	// Send a set of links
 	// (POST /api/v1/upload)
 	SetOfLinks(w http.ResponseWriter, r *http.Request)
@@ -37,11 +44,61 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc func(http.Handler) http.Handler
 
+// GetArchive operation middleware
+func (siw *ServerInterfaceWrapper) GetArchive(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "taskID" -------------
+	var taskID int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "taskID", r.PathValue("taskID"), &taskID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "taskID", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetArchive(w, r, taskID)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // CreateTask operation middleware
 func (siw *ServerInterfaceWrapper) CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CreateTask(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// AppendLink operation middleware
+func (siw *ServerInterfaceWrapper) AppendLink(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "taskID" -------------
+	var taskID int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "taskID", r.PathValue("taskID"), &taskID, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "taskID", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.AppendLink(w, r, taskID)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -185,7 +242,9 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
+	m.HandleFunc("GET "+options.BaseURL+"/api/v1/arch/{taskID}", wrapper.GetArchive)
 	m.HandleFunc("POST "+options.BaseURL+"/api/v1/task", wrapper.CreateTask)
+	m.HandleFunc("PATCH "+options.BaseURL+"/api/v1/task/{taskID}", wrapper.AppendLink)
 	m.HandleFunc("POST "+options.BaseURL+"/api/v1/upload", wrapper.SetOfLinks)
 
 	return m
@@ -194,16 +253,23 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"LnTKi1w7St7N382hvqv/CgAA//+TO+Gxmw8AAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

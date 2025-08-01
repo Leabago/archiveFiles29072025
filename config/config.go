@@ -20,6 +20,7 @@ type App struct {
 	Name         string `yaml:"APP_NAME" env-default:"my-app"`
 	Version      string `yaml:"APP_VERSION" env-default:"1"`
 	MaxNumLinks  int    `yaml:"APP_NUM_LINKS" env-default:"3"`
+	MaxTaskCount int    `yaml:"APP_TASK_COUNT" env-default:"3"`
 	ContentType  string `yaml:"APP_CONTENT_TYPE"`
 	MaxBytesResp int64  `yaml:"APP_MAX_BYTES_RESP" env-default:"51200"`
 }

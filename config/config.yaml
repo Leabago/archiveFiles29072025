@@ -4,7 +4,9 @@ app:
   # APP_VERSION - версия приложения
   APP_VERSION: 1
   # APP_NUM_LINKS - максимальное количесво ссылок для скачивания в запросе 
-  APP_NUM_LINKS: 4
+  APP_NUM_LINKS: 3
+  # APP_TASK_COUNT - число активных тасок
+  APP_TASK_COUNT: 3
   # APP_CONTENT_TYPE - разрешенный формат файлов
   APP_CONTENT_TYPE: "application/pdf,image/jpeg"
   # APP_MAX_BYTES_RESP - ограничение размера скачиваемого файла

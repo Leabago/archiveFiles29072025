@@ -7,7 +7,7 @@ servers:
   - url: http://localhost:8080
 
 paths:
- /api/v1/upload:
+  /api/v1/upload:
     post:
       summary: Send a set of links
       description: Send links
@@ -27,15 +27,11 @@ paths:
             Content-Type:
               schema:
                 type: string
-            X-Error:
-              schema:
-                type: boolean
           content:
             application/zip:
               schema:      
                 type: string
                 format: binary
-
                 
         '400':
           description: Unable to archive one or more files
@@ -57,19 +53,18 @@ paths:
             Content-Type:
               schema:
                 type: string
-            X-Error:
-              schema:
-                type: boolean
           content:
             text/plain:
               schema:      
                 type: string
 
 
- /api/v1/task:
+  /api/v1/task:
     post:
       description: Create a new task
       operationId: createTask
+      tags:
+        - Tasks
       responses:            
         '201':
           description: Task created
@@ -77,19 +72,128 @@ paths:
             Location:
               schema:
                 type: string
-              example: "/tasks/123"
+              example: "/api/v1/task/1"
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Task'
 
+  /api/v1/task/{taskID}:
+    patch:
+      operationId: AppendLink
+      description: Adds a new link to the task's links array
+      tags:
+        - Tasks
+      parameters:
+        - name: taskID
+          in: path
+          description: ID of the task to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:            
+            schema:
+               $ref: '#/components/schemas/AppendLinkRequest'
+      responses:            
+        '200':
+          description: Link successfully appended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse' 
+
+  /api/v1/arch/{taskID}:
+    get:
+      operationId: GetArchive
+      description: Download archive by link
+      tags:
+        - Tasks
+      parameters:
+        - name: taskID
+          in: path
+          description: ID of the completed task
+          required: true
+          schema:
+            type: integer
+      responses:   
+        '200':
+          description: Archive successfully downloaded
+          content:
+            application/zip:
+              schema:      
+                type: string
+                format: binary
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Archive not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
 components:
   schemas:
+    AppendLinkRequest:
+      type: object
+      properties:
+        link: 
+          type: string
+          format: uri
+          example: "https://example.com/image.jpeg"
+
     Links:
       type: array
       items:
         type: string
       example: ["link1", "link2", "link3"]
+
+    ArchLinks:
+      type: array
+      items:
+        $ref: '#/components/schemas/ArchLink'
+ 
+    ArchLink:
+      type: object
+      properties:
+        link:
+          type: string
+        fileName:
+          type: string
+        error:
+          type: string
 
     SetOfLinks:      
       type: object
@@ -100,32 +204,29 @@ components:
     Task:
       type: object
       properties:
-        id: 
+        status:
           type: string
+        id: 
+          type: integer
         created: 
           type: string
           format: date-time
         links:
-          $ref: '#/components/schemas/Links'
+          $ref: '#/components/schemas/ArchLinks'
+        download:
+          type: string
+        error: 
+          type: string
 
-
-
-#     ProcessedLinks:
-#       type: object
-#       properties:
-#         success:
-#           type: boolean
-#           example: true
-#         fileDetails:
-#           type: array
-#           items:
-#             $ref: '#/components/schemas/LinkDetail'
-#     LinkDetail:
-#       type: object
-#       properties:
-#         name:
-#           type: string
-#           example: document.pdf
-#         success:
-#           type: boolean
-#           example: true
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Task not found"
+        code:
+          type: integer
+          example: 404
+        details:
+          type: string
+          example: "No task exists with the specified ID"

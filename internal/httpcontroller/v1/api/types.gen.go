@@ -7,6 +7,28 @@ import (
 	"time"
 )
 
+// AppendLinkRequest defines model for AppendLinkRequest.
+type AppendLinkRequest struct {
+	Link *string `json:"link,omitempty"`
+}
+
+// ArchLink defines model for ArchLink.
+type ArchLink struct {
+	Error    *string `json:"error,omitempty"`
+	FileName *string `json:"fileName,omitempty"`
+	Link     *string `json:"link,omitempty"`
+}
+
+// ArchLinks defines model for ArchLinks.
+type ArchLinks = []ArchLink
+
+// ErrorResponse defines model for ErrorResponse.
+type ErrorResponse struct {
+	Code    *int    `json:"code,omitempty"`
+	Details *string `json:"details,omitempty"`
+	Error   *string `json:"error,omitempty"`
+}
+
 // Links defines model for Links.
 type Links = []string
 
@@ -17,10 +39,16 @@ type SetOfLinks struct {
 
 // Task defines model for Task.
 type Task struct {
-	Created *time.Time `json:"created,omitempty"`
-	Id      *string    `json:"id,omitempty"`
-	Links   *Links     `json:"links,omitempty"`
+	Created  *time.Time `json:"created,omitempty"`
+	Download *string    `json:"download,omitempty"`
+	Error    *string    `json:"error,omitempty"`
+	Id       *int       `json:"id,omitempty"`
+	Links    *ArchLinks `json:"links,omitempty"`
+	Status   *string    `json:"status,omitempty"`
 }
+
+// AppendLinkJSONRequestBody defines body for AppendLink for application/json ContentType.
+type AppendLinkJSONRequestBody = AppendLinkRequest
 
 // SetOfLinksJSONRequestBody defines body for SetOfLinks for application/json ContentType.
 type SetOfLinksJSONRequestBody = SetOfLinks

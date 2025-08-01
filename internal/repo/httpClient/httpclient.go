@@ -69,6 +69,7 @@ func (h *Httpclient) DownloadByLink(url string, num int, l *zap.Logger) *entity.
 
 	result := &entity.DownloadResult{
 		Filename: "file" + strconv.Itoa(num),
+		FileNum:  num,
 	}
 
 	// запорс на скачивание
