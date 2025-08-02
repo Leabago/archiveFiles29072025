@@ -9,7 +9,7 @@ import (
 )
 
 const defaultPort = ":8080"
-const defaultTimout = 5 * time.Second
+const defaultTimout = 30 * time.Second
 
 type Server struct {
 	Server *http.Server

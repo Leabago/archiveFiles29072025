@@ -62,6 +62,7 @@ paths:
   /api/v1/task:
     post:
       description: Create a new task
+      summary: Create a new task
       operationId: createTask
       tags:
         - Tasks
@@ -82,6 +83,7 @@ paths:
     patch:
       operationId: AppendLink
       description: Adds a new link to the task's links array
+      summary: Adds a new link to the task's links array
       tags:
         - Tasks
       parameters:
@@ -127,6 +129,7 @@ paths:
     get:
       operationId: GetArchive
       description: Download archive by link
+      summary: Download archive by link
       tags:
         - Tasks
       parameters:
@@ -172,13 +175,14 @@ components:
         link: 
           type: string
           format: uri
-          example: "https://example.com/image.jpeg"
+          example: "https://sample-videos.com/img/Sample-jpg-image-50kb.jpg"
 
     Links:
       type: array
       items:
         type: string
-      example: ["link1", "link2", "link3"]
+      example: ["https://www.sample-videos.com/img/Sample-jpg-image-50kb.jpg", "https://s24.q4cdn.com/216390268/files/doc_downloads/test.pdf"]
+
 
     ArchLinks:
       type: array

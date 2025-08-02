@@ -21,7 +21,6 @@ const downloadLink = "/api/v1/arch/%d"
 
 type Links struct {
 	httpClient repo.IhttpClient
-	// tempFileManager repo.ItempFileManager
 
 	// масимальное число ссылок
 	maxNumLinks int
@@ -78,9 +77,7 @@ func (p *Links) ProcessLinks(zipWriter *zip.Writer, links []entity.Link, l *zap.
 
 	// архивирование body
 	for v := range file {
-
 		downloadResults = append(downloadResults, v)
-
 		if v.Error == nil {
 			writer, err := zipWriter.Create(v.Filename)
 			if err != nil {
@@ -96,6 +93,10 @@ func (p *Links) ProcessLinks(zipWriter *zip.Writer, links []entity.Link, l *zap.
 		}
 	}
 
+	if len(errMessages) == len(links) {
+		return errMessages, downloadResults, fmt.Errorf("Can't download at least one file")
+	}
+
 	return errMessages, downloadResults, nil
 }
 
@@ -104,7 +105,7 @@ func (u *Links) CreateTask(l *zap.Logger) (*entity.Task, error) {
 	taskCount := u.GetActiveTaskCount()
 	if taskCount >= u.maxTaskCount {
 		return nil, builderror.ActiveTasksLimitError{
-			MaxAllowed: 3,
+			MaxAllowed: u.maxTaskCount,
 		}
 	}
 

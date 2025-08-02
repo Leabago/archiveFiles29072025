@@ -45,7 +45,7 @@ type Httpclient struct {
 
 func New(contentType string, maxBytesResp int64) *Httpclient {
 	client := &http.Client{
-		Timeout: 30 * time.Second,
+		Timeout: 10 * time.Second,
 		Transport: &http.Transport{
 			ResponseHeaderTimeout: 5 * time.Second,
 			TLSHandshakeTimeout:   5 * time.Second,
@@ -70,6 +70,7 @@ func (h *Httpclient) DownloadByLink(url string, num int, l *zap.Logger) *entity.
 	result := &entity.DownloadResult{
 		Filename: "file" + strconv.Itoa(num),
 		FileNum:  num,
+		Content:  []byte{},
 	}
 
 	// запорс на скачивание
@@ -79,6 +80,7 @@ func (h *Httpclient) DownloadByLink(url string, num int, l *zap.Logger) *entity.
 		l.Error(result.Error.Error())
 		return result
 	}
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -96,7 +98,7 @@ func (h *Httpclient) DownloadByLink(url string, num int, l *zap.Logger) *entity.
 	}
 
 	if !lo.Contains(h.allowedContentType, contentType) {
-		result.Error = builderror.ErrUrl(fmt.Sprintf("'Content-Type' header did not pass the filter. 'Content-Type' == %s, allowed Content-Type == ", h.allowedContentType), url)
+		result.Error = builderror.ErrUrl(fmt.Sprintf("'Content-Type' header did not pass the filter. 'Content-Type' == %s, allowed Content-Type == %s", contentType, h.allowedContentType), url)
 		l.Warn(result.Error.Error())
 		return result
 	}

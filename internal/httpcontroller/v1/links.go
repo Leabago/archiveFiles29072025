@@ -17,7 +17,7 @@ import (
 )
 
 func (v *V1) SetOfLinks(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "application/zip")
 	// логгер с id запроса "X-Request-ID"
 	l := logger.FromContext(r.Context())
 	defer r.Body.Close()
@@ -46,9 +46,12 @@ func (v *V1) SetOfLinks(w http.ResponseWriter, r *http.Request) {
 	taskLinks := convertLinks(links.Links)
 
 	// обработать ссылки
+
 	errorMess, _, err := v.Usecase.ProcessLinks(zipWriter, taskLinks, l)
+
 	if err != nil {
 		l.Debug(fmt.Sprintf("IsLinkLimitError: %v", builderror.IsLinkLimitError(err)))
+
 		if builderror.IsLinkLimitError(err) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
@@ -58,7 +61,6 @@ func (v *V1) SetOfLinks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// для скачивания файла archive.zip
-	w.Header().Set("Content-Type", "application/zip")
 	w.Header().Set("Content-Disposition", "attachment; filename=archive.zip")
 	w.Header().Set("Cache-Control", "no-store")
 

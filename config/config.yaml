@@ -10,8 +10,8 @@ app:
   # APP_CONTENT_TYPE - разрешенный формат файлов
   APP_CONTENT_TYPE: "application/pdf,image/jpeg"
   # APP_MAX_BYTES_RESP - ограничение размера скачиваемого файла
-  APP_MAX_BYTES_RESP: 51200
-
+  # APP_MAX_BYTES_RESP: 51200
+  APP_MAX_BYTES_RESP: 10485760
 http:
   # HTTP_PORT - порт для запуска приложения
   HTTP_PORT: ":8080"
