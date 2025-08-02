@@ -181,6 +181,8 @@ func (u *Links) AppendLink(taskID int, link string, l *zap.Logger) (*entity.Task
 		task.FilePath = arch.Name()
 		task.DownloadLink = fmt.Sprintf(downloadLink, taskID)
 		u.UpdateTask(task.ID, *task)
+		// minus 1 active task
+		u.SubtractTaskCount()
 	}
 
 	exist, task = u.CheckTaskExists(taskIDint64)
@@ -249,4 +251,8 @@ func (u *Links) UpdateTask(taskID uint64, task entity.Task) bool {
 
 func (u *Links) GetActiveTaskCount() int {
 	return int(atomic.LoadInt64(&u.activeTaskCount))
+}
+
+func (u *Links) SubtractTaskCount() {
+	atomic.AddInt64(&u.activeTaskCount, -1)
 }
